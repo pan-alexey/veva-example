@@ -1,8 +1,10 @@
-import config, { WebpackConfig, DevConfig } from "@veva/webpack";
+import config, { DevConfig } from "@veva/webpack";
+
+// import {} from "@veva/presets-webpack";
+
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin";
 import MiniCssExtractPlugin, {loader as CssExtractLoader}  from 'mini-css-extract-plugin';
-import webpack from "webpack";
 import sass from 'sass';
 import path from "path";
 
@@ -16,6 +18,10 @@ export default config(async (props) => {
     mode: props.isProd ? "production" : 'development',
     entry: {
       main: "./src/index.tsx",
+    },
+    output: {
+      filename:  props.isProd ? "[name].[contenthash].js" : '[name].js',
+      path: path.resolve(props.processCwd, "./.build"),
     },
     target: "web",
     resolve: {
@@ -87,10 +93,6 @@ export default config(async (props) => {
         },
       ],
     },
-    output: {
-      filename: "[name].js",
-      path: path.resolve(props.processCwd, "./.build"),
-    },
     plugins: [
       new MiniCssExtractPlugin({
         filename: "css/[name].[contenthash:8].css",
@@ -116,7 +118,7 @@ export default config(async (props) => {
             name(module) {
               // @ts-ignore
               const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1]
-              return `./chunks/npm.${packageName.replace('@', '')}`
+              return `./js/vendor/${packageName.replace('@', '')}`
             },
           },
         },
